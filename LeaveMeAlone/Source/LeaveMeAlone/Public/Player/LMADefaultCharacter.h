@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class ULMAHealthComponent;
+class UAnimMontage;
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
@@ -17,6 +19,10 @@ class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ALMADefaultCharacter();
+
+	UFUNCTION()
+	ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; } 
+
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -34,6 +40,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+	ULMAHealthComponent* HealthComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
 
 
 	// Called when the game starts or when spawned
@@ -57,4 +68,15 @@ private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void CameraZoom(float Value);
+	void OnDeath();
+	void OnHealthChanged(float NewHealth);
+	void RotationPlayerOnCursor();
+	void StartSprint();
+	void StopSprint();
+	bool IsSprint;
+	float StepStamina = 1.0f;
+	float Stamina = 100.0f;
+	void DecreaseStamina();
+	void IncreaseStamina();
+
 };

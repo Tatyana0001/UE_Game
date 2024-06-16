@@ -8,6 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/LMAHealthComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
@@ -32,6 +34,7 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 }
 
 // Called when the game starts or when spawned
@@ -42,23 +45,35 @@ void ALMADefaultCharacter::BeginPlay()
 	{
 		CurrentCursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
 	}
+
+	OnHealthChanged(HealthComponent->GetHealth());
+	HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
+	HealthComponent->OnHealthChanged.AddUObject(this, &ALMADefaultCharacter::OnHealthChanged);
 }
 
 // Called every frame
 void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PC)
+	if (!(HealthComponent->IsDead()))
 	{
-		FHitResult ResultHit;
-		PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, ResultHit);
-		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
-		SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
-		if (CurrentCursor)
+		RotationPlayerOnCursor();
+	}
+	if (IsSprint == true && Stamina != 0)
+	{
+		DecreaseStamina();
+	}
+	else
+	{
+		if (IsSprint == false && Stamina != 100.f)
 		{
-			CurrentCursor->SetWorldLocation(ResultHit.Location);
+			IncreaseStamina();
 		}
+	}
+
+	if (FMath::IsNearlyZero(Stamina))
+	{
+		StopSprint();
 	}
 }
 
@@ -70,6 +85,9 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("CameraZoom", this, &ALMADefaultCharacter::CameraZoom);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::StopSprint);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
@@ -80,6 +98,38 @@ void ALMADefaultCharacter::MoveForward(float Value)
 void ALMADefaultCharacter::MoveRight(float Value)
 {
 	AddMovementInput(GetActorRightVector(), Value);
+}
+
+void ALMADefaultCharacter::StartSprint()
+{
+	IsSprint = true;
+	GetCharacterMovement()->MaxWalkSpeed = 1200.0f;
+
+	DecreaseStamina();
+}
+
+void ALMADefaultCharacter::StopSprint() 
+{
+	IsSprint = false;
+	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+
+	IncreaseStamina();
+}
+
+void ALMADefaultCharacter::DecreaseStamina() 
+{
+	Stamina = Stamina - StepStamina;
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Stamina Decreased %f"), Stamina));
+}
+
+void ALMADefaultCharacter::IncreaseStamina()
+{
+	if (IsSprint == false && Stamina < 100)
+	{
+		Stamina = Stamina + StepStamina;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Stamina Increased %f"), Stamina));
+	}
 }
 
 void ALMADefaultCharacter::CameraZoom(float Value)
@@ -96,4 +146,38 @@ void ALMADefaultCharacter::CameraZoom(float Value)
 	SpringArmComponent->TargetArmLength = ArmLength;
 	
 }
+
+void ALMADefaultCharacter::OnDeath()
+{
+	CurrentCursor->DestroyRenderState_Concurrent();
+	PlayAnimMontage(DeathMontage);
+	GetCharacterMovement()->DisableMovement();
+	SetLifeSpan(5.0f);
+	if (Controller)
+	{
+		Controller->ChangeState(NAME_Spectating);
+	}
+}
+
+void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
+}
+
+void ALMADefaultCharacter::RotationPlayerOnCursor()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
+	{
+		FHitResult ResultHit;
+		PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, ResultHit);
+		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
+		SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
+		if (CurrentCursor)
+		{
+			CurrentCursor->SetWorldLocation(ResultHit.Location);
+		}
+	}
+}
+
 
