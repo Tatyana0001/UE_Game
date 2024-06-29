@@ -20,9 +20,15 @@ public:
 	ULMAWeaponComponent();
 
 	void Fire();
-	void StopFire();
 	void Reload();
 	void IsReload();
+
+	UFUNCTION(BlueprintCallable)
+	void StopFire();
+	
+
+	UFUNCTION(BlueprintCallable)
+	bool GetCurrentWeaponAmmo(FAmmoWeapon &AmmoWeapon) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")

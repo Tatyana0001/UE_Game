@@ -106,3 +106,13 @@ void ULMAWeaponComponent::IsReload()
 	StopFire();
 }
 
+bool ULMAWeaponComponent::GetCurrentWeaponAmmo(FAmmoWeapon& AmmoWeapon) const
+{
+	if (Weapon)
+	{
+		AmmoWeapon = Weapon->GetCurrentAmmoWeapon();
+		return true;
+	}
+	return false;
+}
+

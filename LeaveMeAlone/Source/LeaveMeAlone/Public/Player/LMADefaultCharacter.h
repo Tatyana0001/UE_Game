@@ -10,7 +10,6 @@ class UCameraComponent;
 class USpringArmComponent;
 class ULMAHealthComponent;
 class UAnimMontage;
-//class ALMABaseWeapon;
 class ULMAWeaponComponent;
 
 

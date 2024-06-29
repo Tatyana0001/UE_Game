@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "LMAHealthComponent.generated.h"
 
+//class ALMABaseWeapon;
+
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
 
@@ -44,6 +46,9 @@ public:
 
 private:
 	float Health = 0.0f;
+	
+	//UPROPERTY()
+	//ALMABaseWeapon* Weapon = nullptr;
 		
 	UFUNCTION()
 	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);

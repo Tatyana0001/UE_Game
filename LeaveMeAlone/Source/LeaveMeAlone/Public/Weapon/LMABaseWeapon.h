@@ -48,8 +48,11 @@ protected:
 	float TraceDistance = 800.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-	FAmmoWeapon AmmoWeapon{30, 0, true};
+	float SpeedFire = 0.5f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	FAmmoWeapon AmmoWeapon{30, 0, true};
+	
 	void Shoot();
 
 	void DecrementBullets();
@@ -59,9 +62,11 @@ protected:
 	virtual void BeginPlay() override;
 	FTimerHandle TimerHandleClock;
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	FAmmoWeapon GetCurrentAmmoWeapon() const { return CurrentAmmoWeapon; }
 
 private:
 	FAmmoWeapon CurrentAmmoWeapon;

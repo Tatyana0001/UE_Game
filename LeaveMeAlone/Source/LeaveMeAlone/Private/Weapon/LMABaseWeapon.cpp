@@ -21,7 +21,7 @@ ALMABaseWeapon::ALMABaseWeapon()
 
 void ALMABaseWeapon::Fire()
 {
-	GetWorldTimerManager().SetTimer(TimerHandleClock, this, &ALMABaseWeapon::Shoot, 0.5f, true, 0.0f);
+	GetWorldTimerManager().SetTimer(TimerHandleClock, this, &ALMABaseWeapon::Shoot, SpeedFire, true, 0.0f);
 }
 
 void ALMABaseWeapon::StopFire()
@@ -59,7 +59,7 @@ void ALMABaseWeapon::Shoot()
 void ALMABaseWeapon::DecrementBullets()
 {
 	CurrentAmmoWeapon.Bullets--;
-	UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
+	//UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
 
 	if (IsCurrentClipEmpty())
 	{
