@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "LMAHealthComponent.generated.h"
 
-//class ALMABaseWeapon;
 
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
@@ -39,16 +38,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MaxHealth = 100.0f;
 
-
-public:	
-	// Called every frame
-	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 private:
 	float Health = 0.0f;
-	
-	//UPROPERTY()
-	//ALMABaseWeapon* Weapon = nullptr;
 		
 	UFUNCTION()
 	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);

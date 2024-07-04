@@ -55,23 +55,10 @@ void ULMAHealthComponent::OnTakeAnyDamage(
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(Health);
-	//if (Health == 0)
-	//{
-	//	Weapon->StopFire();
-	//}
 
 	if (IsDead())
 	{
 		OnDeath.Broadcast();
 	}
 } 
-
-/*
-// Called every frame
-void ULMAHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}*/
 
