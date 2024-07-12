@@ -61,6 +61,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UFUNCTION(BlueprintCallable)
+	void OnDeath();
 
 private:
 	float YRotation = -75.0f;
@@ -73,7 +76,9 @@ private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void CameraZoom(float Value);
-	void OnDeath();
+
+	
+
 	void OnHealthChanged(float NewHealth);
 	void RotationPlayerOnCursor();
 	void StartSprint();
